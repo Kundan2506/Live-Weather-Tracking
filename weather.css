@@ -1,136 +1,129 @@
-/* Import the new font */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Weather Dashboard</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide-icons@latest/dist/lucide.min.js"></script>
 
-body {
-    font-family: 'Poppins', sans-serif;
-    /* New gradient background */
-    background: linear-gradient(135deg, #6a82fb, #fc5c7d);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: #333;
-}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="weather.css">
+</head>
+<body>
 
-.weather-container {
-    /* Modern "glassmorphism" effect */
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    <div id="app-container">
+        <main class="weather-dashboard">
 
-    padding: 30px;
-    text-align: center;
-    width: 90%;
-    max-width: 450px;
-}
+            <!-- Left Panel: Main Weather Display -->
+            <section class="main-panel glassmorphism">
+                <header class="main-header">
+                    <div class="search-box">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input id="city-input" type="text" placeholder="Search for a city...">
+                    </div>
+                    <button id="location-btn" class="icon-btn" title="Use my location">
+                        <i data-lucide="map-pin"></i>
+                    </button>
+                    <div class="unit-toggle">
+                        <span id="unit-c" class="unit active">°C</span>
+                        <label class="switch">
+                            <input type="checkbox" id="unit-switch">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="unit-f" class="unit">°F</span>
+                    </div>
+                </header>
+                
+                <div id="current-weather-view" class="hidden">
+                    <div class="current-weather-card">
+                        <div class="location-info">
+                            <h1 id="current-city">--</h1>
+                            <p id="current-date">--</p>
+                        </div>
+                        <div class="weather-display">
+                            <img id="current-weather-icon" src="https://placehold.co/128x128/000000/FFFFFF?text=ICON" alt="Weather icon">
+                            <p id="current-temp" class="temperature">--°</p>
+                            <p id="current-condition" class="condition">--</p>
+                        </div>
+                    </div>
+                </div>
 
-h1 {
-    color: #fff;
-    margin-bottom: 25px;
-    font-weight: 600;
-}
+                <div id="message-center" class="message-center-view">
+                    <p id="message-text">Search for a city or use your location.</p>
+                    <div id="loader" class="loader hidden"></div>
+                </div>
 
-.search-area {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-}
+            </section>
 
-#cityInput {
-    flex-grow: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    background: rgba(255, 255, 255, 0.5);
-    color: #333;
-    padding-left: 20px;
-}
+            <!-- Right Panel: Weather Details & Forecasts -->
+            <section id="details-panel" class="details-panel glassmorphism hidden">
+                <!-- Weather Details Grid -->
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <i data-lucide="wind"></i>
+                        <div>
+                            <p class="label">Wind</p>
+                            <p id="current-wind" class="value">--</p>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <i data-lucide="droplets"></i>
+                        <div>
+                            <p class="label">Humidity</p>
+                            <p id="current-humidity" class="value">--</p>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <i data-lucide="sunrise"></i>
+                        <div>
+                            <p class="label">Sunrise</p>
+                            <p id="current-sunrise" class="value">--</p>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <i data-lucide="sunset"></i>
+                        <div>
+                            <p class="label">Sunset</p>
+                            <p id="current-sunset" class="value">--</p>
+                        </div>
+                    </div>
+                </div>
 
-#cityInput::placeholder {
-    color: #555;
-}
+                <!-- Hourly Forecast -->
+                <div class="forecast-section">
+                    <h3>Hourly Forecast</h3>
+                    <div id="hourly-forecast" class="hourly-forecast-container">
+                        <!-- Hourly cards injected by JS -->
+                    </div>
+                </div>
 
-#cityInput:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.8);
-}
+                <!-- 5-Day Forecast -->
+                <div class="forecast-section">
+                    <h3>5-Day Forecast</h3>
+                    <div id="forecast-cards" class="daily-forecast-container">
+                        <!-- Daily cards injected by JS -->
+                    </div>
+                </div>
 
-#searchBtn {
-    padding: 12px 20px;
-    background: #fc5c7d;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
+                 <!-- Past 5 Days -->
+                 <div class="forecast-section">
+                    <h3>Past 5 Days</h3>
+                    <div id="past-weather-cards" class="daily-forecast-container">
+                        <!-- Past cards injected by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
-#searchBtn:hover {
-    background: #d94a64;
-}
-
-#weather-result {
-    margin-top: 20px;
-    color: white;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-}
-
-#weather-result h2 {
-    margin-bottom: 5px;
-    font-size: 32px;
-    font-weight: 600;
-}
-
-#weather-result p {
-    margin: 5px 0;
-    font-size: 18px;
-    font-weight: 300;
-}
-
-#weather-result #description {
-    text-transform: capitalize;
-    font-weight: 400;
-}
-
-#weatherIcon {
-    width: 100px;
-    height: 100px;
-    margin: -10px auto; /* Adjust to better fit layout */
-}
-
-/* NEW: Loader Animation */
-#loader {
-    margin: 20px auto;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #fc5c7d;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    transition: opacity 0.3s ease;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* NEW: Animation class */
-.hidden {
-    display: none;
-}
-
-#error-message p {
-    color: #ffdddd;
-    margin-top: 20px;
-}
+    <!-- Custom JavaScript -->
+    <script src="weather.js"></script>
+</body>
+</html>
