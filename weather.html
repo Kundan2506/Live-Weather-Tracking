@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Weather System</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="weather.css">
+</head>
+<body>
+
+    <div class="weather-container">
+        <h1>Weather Today</h1>
+        <div class="search-area">
+            <input type="text" id="cityInput" placeholder="Enter a city name...">
+            <button id="searchBtn">Search</button>
+        </div>
+        
+        <div id="loader" class="hidden"></div>
+        
+        <div id="weather-result" class="hidden">
+            <h2 id="cityName"></h2>
+            <img id="weatherIcon" src="" alt="Weather Icon">
+            <p id="temperature"></p>
+            <p id="description"></p>
+            <p id="humidity"></p>
+        </div>
+        <div id="error-message" class="hidden">
+            <p>City not found. Please try again.</p>
+        </div>
+    </div>
+
+    <script src="weather.js"></script>
+</body>
+</html>
