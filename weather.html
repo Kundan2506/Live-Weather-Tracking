@@ -3,37 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Weather System</title>
+    <title>Aura Weather Dashboard</title>
     
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide-icons@latest/dist/lucide.min.js"></script>
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="weather.css">
 </head>
 <body>
 
-    <div class="weather-container">
-        <h1>Weather Today</h1>
-        <div class="search-area">
-            <input type="text" id="cityInput" placeholder="Enter a city name...">
-            <button id="searchBtn">Search</button>
-        </div>
-        
-        <div id="loader" class="hidden"></div>
-        
-        <div id="weather-result" class="hidden">
-            <h2 id="cityName"></h2>
-            <img id="weatherIcon" src="" alt="Weather Icon">
-            <p id="temperature"></p>
-            <p id="description"></p>
-            <p id="humidity"></p>
-        </div>
-        <div id="error-message" class="hidden">
-            <p>City not found. Please try again.</p>
-        </div>
+    <div id="app-container">
+        <main class="weather-dashboard">
+
+            <!-- Left Panel: Main Weather Display -->
+            <section class="main-panel glassmorphism">
+                <header class="main-header">
+                    <div class="search-box">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input id="city-input" type="text" placeholder="Search for a city...">
+                    </div>
+                    <button id="location-btn" class="icon-btn" title="Use my location">
+                        <i data-lucide="map-pin"></i>
+                    </button>
+                    <div class="unit-toggle">
+                        <span id="unit-c" class="unit active">°C</span>
+                        <label class="switch">
+                            <input type="checkbox" id="unit-switch">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="unit-f" class="unit">°F</span>
+                    </div>
+                </header>
+                
+                <div id="current-weather-view" class="hidden">
+                    <div class="current-weather-card">
+                        <div class="location-info">
+                            <h1 id="current-city">--</h1>
+                            <p id="current-date">--</p>
+                        </div>
+                        <div class="weather-display">
+                            <img id="current-weather-icon" src="https://placehold.co/128x128/000000/FFFFFF?text=ICON" alt="Weather icon">
+                            <p id="current-temp" class="temperature">--°</p>
+                            <p id="current-condition" class="condition">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="message-center" class="message-center-view">
+                    <p id="message-text">Search for a city or use your location.</p>
+                    <div id="loader" class="loader hidden"></div>
+                </div>
+
+            </section>
+
+            <!-- Right Panel: Weather Details & Forecasts -->
+            <section id="details-panel" class="details-panel glassmorphism hidden">
+                <!-- Weather Details Grid -->
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <i data-lucide="wind"></i>
+                        <div>
+                            <p class="label">Wind</p>
+                            <p id="current-wind" class="value">--</p>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <i data-lucide="droplets"></i>
+                        <div>
+                            <p class="label">Humidity</p>
+                            <p id="current-humidity" class="value">--</p>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <i data-lucide="sunrise"></i>
+                        <div>
+                            <p class="label">Sunrise</p>
+                            <p id="current-sunrise" class="value">--</p>
+                        </div>
+                    </div>
+                    <div class="detail-card">
+                        <i data-lucide="sunset"></i>
+                        <div>
+                            <p class="label">Sunset</p>
+                            <p id="current-sunset" class="value">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hourly Forecast -->
+                <div class="forecast-section">
+                    <h3>Hourly Forecast</h3>
+                    <div id="hourly-forecast" class="hourly-forecast-container">
+                        <!-- Hourly cards injected by JS -->
+                    </div>
+                </div>
+
+                <!-- 5-Day Forecast -->
+                <div class="forecast-section">
+                    <h3>5-Day Forecast</h3>
+                    <div id="forecast-cards" class="daily-forecast-container">
+                        <!-- Daily cards injected by JS -->
+                    </div>
+                </div>
+
+                 <!-- Past 5 Days -->
+                 <div class="forecast-section">
+                    <h3>Past 5 Days</h3>
+                    <div id="past-weather-cards" class="daily-forecast-container">
+                        <!-- Past cards injected by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
+    <!-- Custom JavaScript -->
     <script src="weather.js"></script>
 </body>
 </html>
