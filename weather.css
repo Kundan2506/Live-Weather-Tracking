@@ -1,129 +1,429 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Weather Dashboard</title>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide-icons@latest/dist/lucide.min.js"></script>
+:root {
+    --bg-image: url('https://images.unsplash.com/photo-1483728642387-6c351b40b70b?q=80&w=2070&auto=format&fit=crop');
+    --bg-color: #0a192f;
+    --text-primary: #e6f1ff;
+    --text-secondary: #a8b2d1;
+    --glass-bg: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --accent-color: #64ffda;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --scroll-thumb-color: rgba(255, 255, 255, 0.2);
+    --scroll-track-color: transparent;
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="weather.css">
-</head>
-<body>
+    /* Weather Theme Colors */
+    --theme-sunny: #4a90e2;
+    --theme-cloudy: #7d7d7d;
+    --theme-rainy: #54717a;
+    --theme-snowy: #8a9ba8;
+    --theme-stormy: #4a4e69;
+}
 
-    <div id="app-container">
-        <main class="weather-dashboard">
+/* --- Base & Reset Styles --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-            <!-- Left Panel: Main Weather Display -->
-            <section class="main-panel glassmorphism">
-                <header class="main-header">
-                    <div class="search-box">
-                        <i data-lucide="search" class="search-icon"></i>
-                        <input id="city-input" type="text" placeholder="Search for a city...">
-                    </div>
-                    <button id="location-btn" class="icon-btn" title="Use my location">
-                        <i data-lucide="map-pin"></i>
-                    </button>
-                    <div class="unit-toggle">
-                        <span id="unit-c" class="unit active">°C</span>
-                        <label class="switch">
-                            <input type="checkbox" id="unit-switch">
-                            <span class="slider"></span>
-                        </label>
-                        <span id="unit-f" class="unit">°F</span>
-                    </div>
-                </header>
-                
-                <div id="current-weather-view" class="hidden">
-                    <div class="current-weather-card">
-                        <div class="location-info">
-                            <h1 id="current-city">--</h1>
-                            <p id="current-date">--</p>
-                        </div>
-                        <div class="weather-display">
-                            <img id="current-weather-icon" src="https://placehold.co/128x128/000000/FFFFFF?text=ICON" alt="Weather icon">
-                            <p id="current-temp" class="temperature">--°</p>
-                            <p id="current-condition" class="condition">--</p>
-                        </div>
-                    </div>
-                </div>
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    overflow: hidden;
+}
 
-                <div id="message-center" class="message-center-view">
-                    <p id="message-text">Search for a city or use your location.</p>
-                    <div id="loader" class="loader hidden"></div>
-                </div>
+#app-container {
+    width: 100vw;
+    height: 100vh;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.7s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
 
-            </section>
+/* --- Main Dashboard Layout --- */
+.weather-dashboard {
+    width: 100%;
+    height: 100%;
+    max-width: 1200px;
+    max-height: 800px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
 
-            <!-- Right Panel: Weather Details & Forecasts -->
-            <section id="details-panel" class="details-panel glassmorphism hidden">
-                <!-- Weather Details Grid -->
-                <div class="details-grid">
-                    <div class="detail-card">
-                        <i data-lucide="wind"></i>
-                        <div>
-                            <p class="label">Wind</p>
-                            <p id="current-wind" class="value">--</p>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <i data-lucide="droplets"></i>
-                        <div>
-                            <p class="label">Humidity</p>
-                            <p id="current-humidity" class="value">--</p>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <i data-lucide="sunrise"></i>
-                        <div>
-                            <p class="label">Sunrise</p>
-                            <p id="current-sunrise" class="value">--</p>
-                        </div>
-                    </div>
-                    <div class="detail-card">
-                        <i data-lucide="sunset"></i>
-                        <div>
-                            <p class="label">Sunset</p>
-                            <p id="current-sunset" class="value">--</p>
-                        </div>
-                    </div>
-                </div>
+@media (min-width: 1024px) {
+    .weather-dashboard {
+        grid-template-columns: 400px 1fr;
+    }
+}
 
-                <!-- Hourly Forecast -->
-                <div class="forecast-section">
-                    <h3>Hourly Forecast</h3>
-                    <div id="hourly-forecast" class="hourly-forecast-container">
-                        <!-- Hourly cards injected by JS -->
-                    </div>
-                </div>
+/* --- Glassmorphism Effect --- */
+.glassmorphism {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.5s ease;
+}
 
-                <!-- 5-Day Forecast -->
-                <div class="forecast-section">
-                    <h3>5-Day Forecast</h3>
-                    <div id="forecast-cards" class="daily-forecast-container">
-                        <!-- Daily cards injected by JS -->
-                    </div>
-                </div>
+/* --- Left Panel: Main Weather Display --- */
+.main-panel {
+    justify-content: space-between;
+}
 
-                 <!-- Past 5 Days -->
-                 <div class="forecast-section">
-                    <h3>Past 5 Days</h3>
-                    <div id="past-weather-cards" class="daily-forecast-container">
-                        <!-- Past cards injected by JS -->
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+.main-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
 
-    <!-- Custom JavaScript -->
-    <script src="weather.js"></script>
-</body>
-</html>
+.search-container {
+    position: relative;
+    flex-grow: 1;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+}
+
+.search-box input {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.3);
+}
+
+/* Autocomplete Styles */
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(30, 41, 59, 0.9);
+    backdrop-filter: blur(5px);
+    border-radius: 0 0 0.75rem 0.75rem;
+    overflow: hidden;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--glass-border);
+    border-top: none;
+}
+.autocomplete-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.autocomplete-item:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+}
+.autocomplete-item small {
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+
+.icon-btn {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: rgba(0,0,0,0.4);
+    transform: scale(1.05);
+}
+
+/* Unit Toggle Switch */
+.unit-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,0,0,0.2);
+    padding: 0.25rem;
+    border-radius: 2rem;
+    border: 1px solid var(--glass-border);
+}
+.unit {
+    padding: 0.25rem 0.5rem;
+    border-radius: 1.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.unit.active {
+    background: var(--accent-color);
+    color: var(--bg-color);
+}
+.hidden-switch {
+    display: none;
+}
+
+/* Current Weather View */
+#current-weather-view {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.current-weather-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.location-info h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+.location-info p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+.weather-display {
+    margin: 2rem 0;
+}
+.weather-display img {
+    width: 128px;
+    height: 128px;
+    margin: 0 auto;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+}
+.temperature {
+    font-size: 6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.condition {
+    font-size: 1.25rem;
+    text-transform: capitalize;
+    color: var(--text-secondary);
+}
+
+/* Message Center & Loader */
+#message-center {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--text-primary);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotation 1s linear infinite;
+}
+
+/* --- Right Panel: Details & Forecasts --- */
+.details-panel {
+    overflow-y: auto;
+}
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.detail-card {
+    background: rgba(0,0,0,0.2);
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.detail-card:hover {
+    transform: translateY(-3px);
+    background: rgba(0,0,0,0.3);
+}
+.detail-card i {
+    width: 2rem;
+    height: 2rem;
+    color: var(--accent-color);
+    flex-shrink: 0;
+}
+.detail-card .label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+.detail-card .value {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+/* Forecast Sections */
+.forecast-section h3 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.hourly-forecast-container {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+.hourly-card {
+    flex: 0 0 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,0,0,0.2);
+    padding: 1rem;
+    border-radius: 1rem;
+    transition: transform 0.2s ease;
+}
+.hourly-card:hover {
+    transform: scale(1.05);
+}
+.hourly-card img {
+    width: 48px;
+    height: 48px;
+}
+.hourly-card .temp {
+    font-weight: 600;
+}
+
+.daily-forecast-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.daily-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    background: rgba(0,0,0,0.2);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+.daily-card:hover {
+    background-color: rgba(0,0,0,0.3);
+}
+.daily-card .day {
+    font-weight: 600;
+}
+.daily-card .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.daily-card img {
+    width: 40px;
+    height: 40px;
+}
+.daily-card .temps {
+    text-align: right;
+    color: var(--text-secondary);
+}
+.daily-card .temps span {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Custom Scrollbar */
+.details-panel::-webkit-scrollbar,
+.hourly-forecast-container::-webkit-scrollbar,
+.autocomplete-results::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+.details-panel::-webkit-scrollbar-thumb,
+.hourly-forecast-container::-webkit-scrollbar-thumb,
+.autocomplete-results::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb-color);
+    border-radius: 4px;
+}
+.details-panel::-webkit-scrollbar-track,
+.hourly-forecast-container::-webkit-scrollbar-track,
+.autocomplete-results::-webkit-scrollbar-track {
+    background: var(--scroll-track-color);
+}
+
+/* --- Utility & Animation Classes --- */
+.hidden {
+    display: none !important;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1023px) {
+    #app-container {
+        height: auto;
+        min-height: 100vh;
+        padding: 1rem 0.5rem;
+    }
+    .weather-dashboard {
+        max-height: none;
+    }
+    .main-panel {
+        min-height: 400px;
+    }
+    .details-panel {
+        max-height: 50vh;
+    }
+}
+
+@media (max-width: 767px) {
+    .temperature {
+        font-size: 5rem;
+    }
+    .location-info h1 {
+        font-size: 2rem;
+    }
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
